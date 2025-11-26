@@ -14,7 +14,7 @@ BEGIN
                      ON d.ownerid = a.ownerid 
                         AND d.itemid = a.attachedid 
                         AND a.itemtype = 6 
-             inner join leads l 
+             inner join leads l
                      ON l.ownerid = a.ownerid 
                         AND l.leadid = a.itemid 
              inner join lea_ex3 L3 
