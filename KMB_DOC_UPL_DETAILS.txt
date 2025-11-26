@@ -1,0 +1,34 @@
+create or replace 
+PROCEDURE KMB_DOC_UPL_DETAILS
+ (   
+    v_OwnerID NUMBER,
+    cv_1   OUT SYS_REFCURSOR
+ ) 
+AS
+BEGIN 
+
+ 
+    OPEN cv_1 FOR 
+      
+      SELECT '\\10.10.5.138\uploadroot\store641\' || A.ATTACHEDID || '_1' AS DOCPATH,
+             '\\10.10.5.138\uploadroot\DAP_KOTAK\DAPRESTRUCTURINGPL\Offerbase_Approval\' || d.ITEMNAME as TargetPath
+      FROM   DMSMASTER d 
+             inner join ATTACHMENTMASTER a 
+                     ON d.OWNERID = a.OWNERID 
+                        AND d.ITEMID = a.Attachedid
+                        AND a.ITEMTYPE = 242 
+                         inner join patterncustomdata pd1
+                        on a.attachedid=pd1.docid
+             inner join KMB_APP_DOC_LT LT 
+                     ON LT.ApprovalID = a.ITEMID 
+                     
+                     
+             inner join KMB_APP_DOC_LT LT 
+                     ON LT.ApprovalID = a.ITEMID 
+                     where pd1.fieldid=3136;
+         
+    
+             
+      
+    
+END;

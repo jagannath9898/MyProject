@@ -1,0 +1,95 @@
+create or replace 
+PROCEDURE KMB_FETCH_SIGNATURE_PATH(
+    V_OWNERID IN NUMBER,
+    CV_1 OUT SYS_REFCURSOR)
+AS
+  V_JOBID        NUMBER(10, 0);
+  V_TASKID       NUMBER(10, 0);
+  V_BATCHNUMBER  NUMBER(10, 0);
+  V_CURRENTDATE  DATE;
+  v_count number(20);
+
+BEGIN
+ ---------------------------- Fetch Job ID of this job ------------------------ 
+  SELECT JOBID
+  INTO V_JOBID
+  FROM CIS_Job
+  WHERE OWNERID = v_OwnerID
+        AND JOBNAME = 'Signature File export to Finacle';
+        
+  ------------ Fetch Task Id of this Task -----------
+  SELECT TaskID
+  INTO   V_TASKID
+  FROM   CIS_TASK
+  WHERE  OwnerID = v_OwnerID
+       AND JOBID = V_JOBID
+       AND TASKNAME = 'Fetch File Path Details';
+       
+       ---------------------------- Fetch Current Date Time And Job Execution Batch Number ------------------------ 
+ 
+  V_CURRENTDATE := GETDATE();
+  V_BATCHNUMBER := CIS_GET_BATCH_NUMBER(V_OWNERID, V_JOBID);
+       
+OPEN CV_1 FOR 
+
+
+      SELECT '\\10.10.5.138\uploadroot\Store641\' || a.ATTACHEDID || '_1' as SourcePath,
+             '\\10.10.5.138\Uploadroot\CurrentAccount\Finacle_Signature\' || nvl(L2.LEA_EX2_140,'ACCNO') ||'_'||nvl(L1.LEA_EX1_2,'CRN')|| '_1.tif' as TargetPath
+      FROM   DMSMASTER d 
+             inner join ATTACHMENTMASTER a 
+                     ON d.OWNERID = a.OWNERID 
+                        AND d.ITEMID = a.Attachedid
+                        AND a.ITEMTYPE = 6 
+             inner join LEADS l 
+                     ON l.OWNERID = a.OWNERID 
+                        AND l.LEADID = a.ITEMID 
+             inner join Lea_ex1 l1
+                    ON l.ownerid=l1.ownerid
+                      AND l.leadid = l1.lea_ex1_id  
+             inner join Lea_ex2 l2
+                    ON l.ownerid=l2.ownerid
+                      AND l.leadid = l2.lea_ex2_id 
+              inner join Lea_ex5 l5
+                    ON l.ownerid=l5.ownerid
+                      AND l.leadid = l5.lea_ex5_id
+                      and l5.LEA_EX5_104=d.itemid
+            
+      WHERE  l.ownerid= V_OWNERID
+      and  L.Statuscodeid=100102 -- account activation
+      AND l1.LEA_EX1_16=0 --smart count
+      --and d.itemname='Signature.jpeg' and d.description='Signature'
+     ;
+     
+     
+     select count(1)  into v_count FROM   DMSMASTER d 
+             inner join ATTACHMENTMASTER a 
+                     ON d.OWNERID = a.OWNERID 
+                        AND d.ITEMID = a.Attachedid
+                        AND a.ITEMTYPE = 6 
+             inner join LEADS l 
+                     ON l.OWNERID = a.OWNERID 
+                        AND l.LEADID = a.ITEMID 
+             inner join Lea_ex1 l1
+                    ON l.ownerid=l1.ownerid
+                      AND l.leadid = l1.lea_ex1_id  
+             inner join Lea_ex2 l2
+                    ON l.ownerid=l2.ownerid
+                      AND l.leadid = l2.lea_ex2_id 
+              inner join Lea_ex5 l5
+                    ON l.ownerid=l5.ownerid
+                      AND l.leadid = l5.lea_ex5_id
+                      and l5.LEA_EX5_104=d.itemid
+            
+      WHERE  l.ownerid= V_OWNERID
+      and  L.Statuscodeid=100102 -- account activation
+      AND l1.LEA_EX1_16=0 
+      ;
+
+--------------------- Update count of valid and invalid records in CIS_Log table for ease of visibility on UI --------------------
+UPDATE Cis_Log
+SET    successcount = v_count
+WHERE  ownerid = V_OWNERID
+       AND BATCHNUMBER = V_BATCHNUMBER
+       AND SOURCEID = V_TASKID;
+
+END;

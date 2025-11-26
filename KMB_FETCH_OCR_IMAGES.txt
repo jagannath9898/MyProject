@@ -1,0 +1,30 @@
+create or replace 
+PROCEDURE KMB_FETCH_OCR_IMAGES(
+    V_LEADID  IN NUMBER,
+    V_OWNERID IN NUMBER,
+    CV_1 OUT SYS_REFCURSOR)
+AS
+BEGIN
+  OPEN CV_1 FOR SELECT * FROM
+  (SELECT
+    --l.LEADID,
+    --    itemname,
+    --    contenttype,
+    --    a.attachmentid,
+    '\\10.10.5.138\uploadroot\Store641\' || A.ATTACHEDID || '_1'  AS Path
+  
+FROM   DMSMASTER d                     
+inner join ATTACHMENTMASTER a                      
+ON d.OWNERID = a.OWNERID                         
+AND d.ITEMID = a.Attachedid                        
+AND a.ITEMTYPE = 6              
+inner join LEADS l                      
+ON l.OWNERID = a.OWNERID                         
+AND l.LEADID = a.ITEMID                                 
+WHERE  l.ownerid= V_OWNERID  
+AND l.leadid=V_LEADID
+AND d.createdbytype<>-1
+-- and  L.Statuscodeid=100102  
+order by A.ATTACHEDID 
+);
+END;

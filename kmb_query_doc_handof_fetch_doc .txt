@@ -1,0 +1,44 @@
+create or replace 
+PROCEDURE kmb_query_doc_handof_fetch_doc (
+    v_ownerid NUMBER,
+    cv_1 OUT   SYS_REFCURSOR
+) AS
+/*
+
+  Requirement:in this sp doc details shuold be moved from upload root to dms location
+  Author :Phaneendra Popuri
+  Last modified on :14-12-2020
+  last Modified by:
+  changes:
+
+*/
+BEGIN
+    OPEN cv_1 FOR SELECT
+                      '\\10.10.5.138\\UploadRoot\\Store641\\'
+                      || lt.attachmentid
+                      || '_1' AS docpath,
+                      '\\10.240.5.97\\LOS_App6\\UpLoads\\Lead\\'
+                      || lex1.lea_ex1_183
+                      || '\\Lead_'
+                      || translate(lt.itemname, '!,@#$%^&*()-:";<>?/|\', '_____________________') AS targetpath
+                  FROM
+                      kmb_los_handof_details_lt lt
+                      JOIN lea_ex1 lex1 ON lex1.lea_ex1_id = lt.leadid
+                  WHERE
+                      flag = 'L'
+                  UNION ALL
+                  SELECT
+                      '\\10.10.5.138\\UploadRoot\\Store641\\'
+                      || lt.attachmentid
+                      || '_1' AS docpath,
+                      '\\10.240.5.97\\LOS_App6\\UpLoads\\Lead\\'
+                      || lex1.lea_ex1_183
+                      || '\Coapplicant_'
+                      || translate(lt.itemname, '!,@#$%^&*()-:“;<>?/|\', '_____________________') AS targetpath
+                  FROM
+                      kmb_los_handof_details_lt lt
+                      JOIN lea_ex1 lex1 ON lex1.lea_ex1_id = lt.leadid
+                  WHERE
+                      flag = 'C';
+
+END;

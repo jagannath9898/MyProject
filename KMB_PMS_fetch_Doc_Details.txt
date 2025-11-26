@@ -1,0 +1,70 @@
+create or replace 
+PROCEDURE KMB_PMS_fetch_Doc_Details(
+    v_OwnerID NUMBER,
+    cv_1 OUT SYS_REFCURSOR )
+AS
+  V_JOBID        NUMBER(10, 0);
+  V_TASKID       NUMBER(10, 0);
+  V_BATCHNUMBER  NUMBER(10, 0);
+  V_CURRENTDATE  DATE;
+  V_SUCCESSCOUNT NUMBER(10, 0):=0;
+BEGIN
+
+-------------- Fetch Job Id of this Job -----------
+SELECT Jobid
+INTO   V_JOBID
+FROM   CIS_Job
+WHERE  OWNERID = V_OWNERID
+       AND JOBNAME = 'KMB PMS Master Table Update Job';
+
+-------------- Fetch Task Id of this Task -----------
+SELECT TaskID
+INTO   V_TASKID
+FROM   CIS_TASK
+WHERE  OwnerID = v_OwnerID
+       AND JOBID = V_JOBID
+       AND TASKNAME = 'Fetch Doc details';
+
+
+-------------- Fetch Current Batch Number -----------
+V_BATCHNUMBER := CIS_GET_BATCH_NUMBER(V_OWNERID, V_JOBID);
+
+  OPEN cv_1 FOR 
+  SELECT SourceFileName,TargetFileName FROM
+  (
+
+ SELECT '\\10.10.5.138\\UploadRoot\\Store641\\' || MAX(A.attachedid)  || '_1' AS SourceFileName,--\\10.240.21.222\uploadroot\Store641\
+'\\10.10.5.138\Uploadroot\CRM_KOTAK\PSM\'|| MAX(A.attachedid)  || '_1.csv'
+     AS TargetFileName
+  FROM DMSMASTER d
+  INNER JOIN ATTACHMENTMASTER a
+  ON d.OWNERID   = a.OWNERID
+  AND d.ITEMID   = a.Attachedid
+  AND a.ITEMTYPE =242
+  INNER JOIN APPROVAL AP
+  ON AP.OWNERID=a.OWNERID
+  AND AP.APPROVALID = a.ITEMID
+  INNER JOIN CIS_JOB J
+  ON AP.OWNERID=J.OWNERID
+  WHERE AP.STATUSCODEID=5028
+  AND AP.LAYOUTID=112296
+  AND J.JOBID=1830
+  AND ROWNUM=1
+  AND AP.LASTMODIFIEDON>J.LASTRUNON
+  order by ap.approvalid desc
+
+  );
+
+-------------- Count---------------
+V_SUCCESSCOUNT := SQL%ROWCOUNT;
+
+
+---------------------- Update count of updated records in CIS_Log table for ease of visibility on UI --------------------
+UPDATE Cis_Log
+SET successcount = V_SUCCESSCOUNT
+WHERE ownerid    = V_OWNERID
+AND BATCHNUMBER  = V_BATCHNUMBER
+AND SOURCEID     = V_TASKID;
+
+
+End;
