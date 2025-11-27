@@ -1,0 +1,71 @@
+create or replace 
+PROCEDURE KMB_CC_CKYC_MOVERRCD(V_OWNERID IN NUMBER)
+AS
+  v_jobid        NUMBER;
+  v_taskid       NUMBER;
+  v_batchnumber  NUMBER;
+  v_successcount NUMBER := 0;
+  v_currentdate  DATE := Getutcdate();
+BEGIN
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_SORT = ''BINARY_CI''';
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_COMP = ''LINGUISTIC''';
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_DATE_FORMAT = ''DD-MM-YYYY HH24:MI:SS''';
+    
+
+    ----- GET JOBID OF JOB -----
+    SELECT jobid
+    INTO   v_jobid
+    FROM   cis_job
+    WHERE  ownerid = v_ownerid
+           AND jobname = 'CC CKYC Attachment';
+
+    ----- GET TASKID OF JOB -----
+    SELECT taskid 
+    INTO   v_taskid
+    FROM   cis_task
+    WHERE  ownerid = v_ownerid
+           AND jobid = v_jobid
+           AND taskname = 'Move Records to Log Table';
+
+    ----- GET CURRENT BATCHNUMBER -----
+    v_batchnumber := Cis_get_batch_number(v_ownerid, v_jobid);
+
+    ----- MOVE ALL RECORDS TO LOG TABLE -----
+    INSERT INTO kmb_ckyc_userimg_log
+                (ekycid,
+                 leadid,
+                 userimage,
+                 layoutid,
+                 processid,
+                 arn,
+                 biometric_flag,
+                 errorcode,
+                 errormessage,
+                 processedon,
+                 batchnumber)
+    SELECT ekycid,
+           leadid,
+           userimage,
+           layoutid,
+           processid,
+           arn,
+           biometric_flag,
+           errorcode,
+           errormessage,
+           v_currentdate,
+           v_batchnumber
+    FROM   kmb_ckyc_userimg_lt;
+
+    ----- GET COUNT OF RECORDS MOVED TO LOG TABLE -----
+    v_successcount := SQL%rowcount;
+
+    ---- UPDATE RECORD COUNT IN CIS_LOG FOR EASY VISIBILITY ON UI ----
+    UPDATE cis_log
+    SET    successcount = v_successcount
+    WHERE  ownerid = v_ownerid
+           AND batchnumber = v_batchnumber
+           AND sourceid = v_taskid
+           AND sourcetypeid = 3;
+END; 
+
+/

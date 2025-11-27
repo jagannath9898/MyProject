@@ -1,0 +1,22 @@
+create or replace FUNCTION BlobToClob(p_blob BLOB) RETURN CLOB IS
+    v_clob CLOB;
+    v_dest_offset INTEGER := 1;
+    v_src_offset INTEGER := 1;
+    v_lang_ctx INTEGER := DBMS_LOB.DEFAULT_LANG_CTX;
+    v_warning INTEGER;
+BEGIN
+    DBMS_LOB.CREATETEMPORARY(v_clob, TRUE);
+
+    DBMS_LOB.CONVERTTOCLOB(
+        DEST_LOB     => v_clob,
+        SRC_BLOB     => p_blob,
+        AMOUNT       => DBMS_LOB.LOBMAXSIZE,
+        DEST_OFFSET  => v_dest_offset,
+        SRC_OFFSET   => v_src_offset,
+        BLOB_CSID    => DBMS_LOB.DEFAULT_CSID,
+        LANG_CONTEXT => v_lang_ctx,
+        WARNING      => v_warning
+    );
+
+    RETURN v_clob;
+END BlobToClob;

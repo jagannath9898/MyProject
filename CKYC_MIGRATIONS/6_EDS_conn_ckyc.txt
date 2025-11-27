@@ -1,0 +1,123 @@
+SET SCAN OFF ; 
+Alter TRIGGER MASHUPQUERY_ORDER_TRG DISABLE ;
+DELETE FROM MashupDBConnection WHERE ownerId = 641 AND  ConnectionId IN (2289) ;  
+DELETE FROM MashupwsConnection WHERE ownerId = 641 AND  ConnectionId IN (2289) ;  
+DELETE FROM MashupQueryParameter where DataSourceId IN (SELECT DataSourceId FROM MashupDataSource WHERE ConnectionId IN (2289)) ;  
+DELETE FROM MashupParamMapping where DataSourceId IN (SELECT DataSourceId FROM MashupDataSource WHERE ConnectionId IN (2289)) ;  
+DELETE FROM MashupDataSourceField where DataSourceId IN (SELECT DataSourceId FROM MashupDataSource WHERE ConnectionId IN (2289)) ;  
+DELETE FROM MashupDataSource WHERE ownerId = 641 AND  ConnectionId IN (2289) ;  
+DELETE FROM MashupConnection WHERE ownerId = 641 AND  ConnectionId IN (2289) ;  
+
+SET DEFINE OFF;
+SET DEFINE OFF;
+SET DEFINE OFF;
+SET DEFINE OFF;
+SET DEFINE OFF;
+SET DEFINE OFF;
+SET DEFINE OFF;
+INSERT INTO MashupConnection (
+OWNERID,CONNECTIONID,NAME,DESCRIPTION,TYPE,TIMEOUT,ISENABLED,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,ISFRESHCONNECTION,PROXYID,ENCRYPTIONTYPE,USEENCRYPTION,PUBLICKEY,KEYSIZE,APPLICATIONTYPE,CONFIGXML,ADDITIONALSETTINGS,AUTHTOKEN,TOKENEXPIRY
+) VALUES(641,2289,'CC CKYC Image attachment','CC CKYC Image attachment',10,0,1,'MR. Jagaath ajay jena',To_Date('2024-07-31 11:37:41', 'YYYY-MM-DD HH24:MI:SS'),'Kotak Bank Admin',To_Date('2024-08-05 15:42:21', 'YYYY-MM-DD HH24:MI:SS'),0,Null,0,0,Null,0,Null,Null,Null,Null,Null) ; 
+
+INSERT INTO MashupDataSource (
+OWNERID,DATASOURCEID,CONNECTIONID,NAME,SOURCETYPE,SOURCE,RETURNTYPE,RETURNMODE,DATAXPATH,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,ERRORCODEPATH,ERRORSTRINGPATH,PRIMARYFIELD,ISUTCDATETIME,ERRORCODEFIELDID,ERRORMSGFIELDID,TRANSACTIONFIELD,SUCCESSCODE,INDEXPARAMETER,BATCHSIZE,TOTALCOUNTXPATH,BATCHPARAMETER,USERIDPARAMETER,CURRENTTIMEFIELD,INPUTDATETIMEFORMAT,ENABLELOGGING,RETENTIONPERIOD,INITIALSYMBOLS,RENAMESYMBOLS,DESCRIPTION,XSLT,XSLTREFERENCEFIELD,RESTINVOKEMETHOD,USEENCRYPTION,ENCRYPTIONKEY,RESTINPUTMODE,IMAGEHEIGHT,IMAGEWIDTH,IMAGEFORMAT,XSLTTAG,CHECKFORERROR,CURRENTRECORDCOUNTPATH,REPLYQUEUE,WAITINTERVAL,REMOTEQUEUEMANAGERNAME,STRINGMODE,LOGINIDFIELD,BRANCHCODEPARAMETER,BRANCHIDPARAMETER,BRANCHNAMEPARAMETER,IPADDRESSFIELD,EMPLOYEECODEFIELD,INPUTXSLT,PASSWORD,ISSECURITYENABLED,SERVICETYPEID,IGNOREHTMLENCODE,FAULTCODEXPATH,FAULTMESSAGEXPATH,FAULTXSLT,ENCODING,SKIPNODEEXCEPTION,PREVPAGETOKENXPATH,NEXTPAGETOKENXPATH,ADDITIONALSETTINGS,OUTPUTLOGXSLT
+) VALUES(641,7437,2289,' CC CKYC Image attachment EDS',0,'CRMnextService.svc',3,1,'root','MR. Jagaath ajay jena',To_Date('2024-07-31 06:15:01', 'YYYY-MM-DD HH24:MI:SS'),'Kotak Bank Admin',To_Date('2024-08-05 08:55:26', 'YYYY-MM-DD HH24:MI:SS'),Null,Null,'-1',1,-1,-1,Null,Null,Null,0,Null,Null,Null,Null,Null,1,30,Null,Null,'CC CKYC Image attachment EDS','<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" 
+    xmlns:api="http://www.crmnext.com/api/"
+    xmlns:msxsl="urn:schemas-microsoft-com:xslt"
+    exclude-result-prefixes="msxsl api s">
+    
+    <xsl:output method="xml" indent="yes"/>
+    
+    <xsl:template match="/">
+        <root>
+            <xsl:for-each select="//api:Message">
+                <Message>
+                    <xsl:value-of select="."/>
+                </Message>
+            </xsl:for-each>
+        </root>
+    </xsl:template>
+</xsl:stylesheet>',Null,2,0,Null,0,0,0,Null,Null,0,Null,Null,0,Null,0,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,0,Null,Null,Null,Null,Null,Null,Null,Null,Null) ; 
+
+INSERT INTO MashupDataSourceField (
+OWNERID,FIELDID,DATASOURCEID,NAME,LABEL,TYPE,ISSEARCHABLE,ISFILTERABLE,ISDISPLAY,XPATH,ADDEDBY,ADDEDON,FORMAT,MASKSTARTPOS,MASKTOTALCHAR,MASKCHAR,APPLYMASKONNEWEDIT,CONTENTNAMEFIELD,CONTENTTYPEFIELD,ISCASTREQUIRED,OUTPARAMETERINDEX,MASKFORMATID,EDSRESOLVERID,GROUPID,GROUPNAME,PARENTGROUPID,MAXLENGTH
+) VALUES(641,14699,7437,'Message','Message','String',0,0,0,'Message','Kotak Bank Admin',To_Date('2024-08-05 08:55:26', 'YYYY-MM-DD HH24:MI:SS'),Null,0,0,'*',0,Null,Null,Null,Null,-1,-1,0,Null,0,0) ; 
+
+ 
+INSERT INTO MashupParamMapping (
+OWNERID,MAPPINGID,DATASOURCEID,CREATEDBY,CREATEDON,MAPPINGXML
+) VALUES(641,120994,7437,1,To_Date('2024-08-05 08:55:27', 'YYYY-MM-DD HH24:MI:SS'),'<mappings><mapping parametername=''USERIMAGE'' mappedcolumn=''InputParam1'' /><mapping parametername=''LEADID'' mappedcolumn=''InputParam2'' /></mappings>') ; 
+
+ 
+ 
+Declare 
+ v_sqlXL_TEMPLATE NCLOB;
+v_sqlXL1_TEMPLATE NCLOB;
+v_sqlXL2_TEMPLATE NCLOB;
+BEGIN
+ v_sqlXL1_TEMPLATE := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:api="http://www.crmnext.com/api/">
+  <soapenv:Header />
+  <soapenv:Body>
+    <api:Save>
+      <api:userContext>
+            <api:IsSuccess>true</api:IsSuccess>
+            <api:Message xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            <api:ClientTimeOffSet>0</api:ClientTimeOffSet>
+            <api:ExpiresOn>2620-09-15T23:10:20.0823603+05:30</api:ExpiresOn>
+            <api:IsUTC>false</api:IsUTC>
+            <api:LongDateFormat xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            <api:LongDateTimeFormat xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            <api:Token>qjg8clqv8mjs5njd6l2s676fkprydxqljvz4rcfeb55yfrjx2l4732fw8wtzfzw5catp8qstn4ph3htpw5p4hswpwurjlr93sn76nvc9ct2xew3jc485l7rnks8bhbrkw4u2xk9hfnyyndrvfs3gwfj9dd7mzyrm459y3hsb6lawvjnqt8x273x63r4kckws6peh25n2l8hx45f3nuezde9zgcw7nu9pecu878pb6a3y86amav84u9zk2hq3aruwl7hbq65jab76d7pyj2m8fvjvdzlrbqfknsb6qlq9nhplmjyspmperfrnwr2d2ucabendfyfzmb97deujxmd6p88zr9d8qblntbrwmnpztfwxqp3aferd5l675llu94mjjk94l2rm79c8hdjhqeu48vxdven46f2uqxggnmc5tgwt6zedj8v23u5a2qqvpenxrasjw5cptmcqvyxae2s4d7khxrjbamk2phzp2dt995cp66pqzsn68wyvn4zrn8sun3v7d5et4zfejkveajn6cz4tn24bcqjvk7b8g2j8mnj265he3sbw5s2tm58wc7kvlr6pkttuhjqdrz9k2lfwz54xapw9a8ghx5exgd2</api:Token>
+            <api:UserFieldName xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            <api:UserFieldValue xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+         </api:userContext>
+      <api:objects>
+        <api:CRMnextObject xsi:type="api:DMS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <api:Description></api:Description>	<!-- Description of the document to be attached -->
+          <api:FileBase64String>##USERIMAGE##</api:FileBase64String>
+		  <api:ItemName>EKYC_PHOTO.jpeg</api:ItemName> <!-- Name -->
+          <api:Ite';
+ v_sqlXL2_TEMPLATE := 'mOwnerID>641</api:ItemOwnerID>   
+         <api:ObjectItemId>##LEADID##</api:ObjectItemId> 
+          
+          <api:ObjectTypeId>6</api:ObjectTypeId>   <!-- Item type to be hardcoded to 6 for Lead -->
+        </api:CRMnextObject>
+      
+       
+      </api:objects>
+    </api:Save>
+  </soapenv:Body>
+</soapenv:Envelope>';
+v_sqlXL_TEMPLATE := '';
+v_sqlXL_TEMPLATE :=  v_sqlXL1_TEMPLATE ||  v_sqlXL2_TEMPLATE  ;  
+INSERT INTO MashupQueryParameter (
+OWNERID,DATASOURCEID,NAME,TYPE,ISMANDATORY,ADDEDBY,ADDEDON,PARAMETERORDER,DISPLAYNAME,TEMPLATE,PARAMPROPERTIES,ISCOLLECTION,ISENUM,ISHEADERPROPERTY,TEMPLATEPROPERTIES,ARRAYTEMPLATEID,ARRAYTEMPLATENAME
+) VALUES(641,7437,'input','string',0,'Kotak Bank Admin',To_Date('2024-08-05 08:55:26', 'YYYY-MM-DD HH24:MI:SS'),Null,'input',v_sqlXL_TEMPLATE,Null,0,0,0,Null,0,Null);
+END ;
+
+
+/
+
+ 
+Declare v_sqlXL_SERVICEXML NCLOB;
+BEGIN
+ v_sqlXL_SERVICEXML := '<webService xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><id xmlns="www.crmnext.com/biznext/service">2289</id><connectionTimeout xmlns="www.crmnext.com/biznext/service">0</connectionTimeout><IsFreshConnection xmlns="www.crmnext.com/biznext/service">true</IsFreshConnection><IsHistory xmlns="www.crmnext.com/biznext/service">false</IsHistory><historyid xmlns="www.crmnext.com/biznext/service">-1</historyid><ProxyID xmlns="www.crmnext.com/biznext/service">-1</ProxyID><ProxyName xmlns="www.crmnext.com/biznext/service"> </ProxyName><UseEncryption xmlns="www.crmnext.com/biznext/service">false</UseEncryption><EncryptionType xmlns="www.crmnext.com/biznext/service">0</EncryptionType><KeySize xmlns="www.crmnext.com/biznext/service">0</KeySize><name xmlns="www.crmnext.com/biznext/service"> </name><serviceLocation xmlns="www.crmnext.com/biznext/service">https://crmmobileuat.kotak.com/CRMnextWebApi</serviceLocation><wsdlLocation xmlns="www.crmnext.com/biznext/service"> </wsdlLocation><protocol xmlns="www.crmnext.com/biznext/service" /><isWcfClient xmlns="www.crmnext.com/biznext/service">false</isWcfClient><isSilverlight xmlns="www.crmnext.com/biznext/service">false</isSilverlight><HeaderVariablesXml xmlns="www.crmnext.com/biznext/service">&lt;Headers&gt;
+  &lt;Header Name="SOAPACTION" Value="http://www.crmnext.com/api/ICRMnextApi/Save" /&gt;
+  &lt;Header Name="Content-Type" Value="text/xml" /&gt;
+&lt;/Headers&gt;</HeaderVariablesXml></webService>';
+INSERT INTO MashupwsConnection (
+OWNERID,CONNECTIONID,SERVICENAME,SERVICELOCATION,WSDLLOCATION,SERVICEXML,ISWCFSERVICE,ISSILVERLIGHTCLIENT,USERID,PASSWORD,SETTINGXML,ASSEMBLYNAME,CLASSNAME,USEREFLECTION,REQUESTHEADERKEYXML
+) VALUES(641,2289,' ','https://crmmobileuat.kotak.com/CRMnextWebApi',' ',v_sqlXL_SERVICEXML,0,0,'AeU0qFtgkjA=','AeU0qFtgkjA=',Null,Null,Null,0,'<Headers>
+  <Header Name="SOAPACTION" Value="http://www.crmnext.com/api/ICRMnextApi/Save" />
+  <Header Name="Content-Type" Value="text/xml" />
+</Headers>');
+END ;
+
+
+/
+
+
+
+

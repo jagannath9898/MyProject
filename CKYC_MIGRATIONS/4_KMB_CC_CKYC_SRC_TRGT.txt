@@ -1,0 +1,160 @@
+create or replace 
+PROCEDURE KMB_CC_CKYC_SRC_TRGT(V_OWNERID NUMBER,
+                                                    CV_1 OUT SYS_REFCURSOR)
+                                                    
+AS
+  v_jobid        NUMBER;
+  v_taskid       NUMBER;
+  v_batchnumber  NUMBER;
+  v_successcount NUMBER := 0;
+  v_currentdate  DATE := Getutcdate();
+  
+  /* THIS sp WILL UPDATE SUCCES AND FAILURE REORDS IN lt TABLE AND MAINTAINED sync FLAG TO AVOID DUPLICATE RECORDS
+     ALSO MOVE FILE FROM SOURCE PATH TO TARGET PATH AS MENTION BELOW
+  */
+BEGIN
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_SORT = ''BINARY_CI''';
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_COMP = ''LINGUISTIC''';
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_DATE_FORMAT = ''DD-MM-YYYY''';
+
+    ----- GET JOBID OF JOB -----
+    SELECT jobid
+    INTO   v_jobid
+    FROM   cis_job
+    WHERE  ownerid = V_OWNERID
+           AND jobname = 'CC CKYC Attachment';
+
+    ----- GET TASKID OF JOB -----
+    SELECT taskid
+    INTO   v_taskid
+    FROM   cis_task
+    WHERE  ownerid = V_OWNERID
+           AND jobid = v_jobid
+           AND taskname = 'Update document data in LT table';
+
+    ----- GET CURRENT BATCHNUMBER -----
+    v_batchnumber := Cis_get_batch_number(v_ownerid, v_jobid);
+
+    --------Update Failure record in LT------
+    merge INTO kmb_ckyc_userimg_lt LT1
+    USING(SELECT L9.lea_ex9_id  AS leadid,
+                 l9.lea_ex9_196 AS Message
+          FROM   lea_ex9 L9
+                 inner join leads L
+                         ON L.ownerid = L9.ownerid
+                            AND L.leadid = L9.lea_ex9_id
+          WHERE  L.ownerid =V_OWNERID
+                 AND l9.lea_ex9_196 NOT IN ('Successfully Uploaded'))a
+    ON(LT1.leadid=a.leadid)
+    WHEN matched THEN
+      UPDATE SET LT1.errormessage = Substr(a.message, 1, 250),
+                 lt1.errorcode = 1;
+
+  ------------
+  
+    -- Update success and Failure records records in LT table
+    MERGE INTO kmb_ckyc_userimg_lt LT1
+    USING (
+        SELECT L9.lea_ex9_id AS leadid,
+               l9.lea_ex9_196 AS Message
+        FROM   lea_ex9 L9
+               INNER JOIN leads L
+                       ON L.ownerid = L9.ownerid
+                          AND L.leadid = L9.lea_ex9_id
+        WHERE  L.ownerid = v_ownerid
+    ) a
+    ON (LT1.leadid = a.leadid)
+    WHEN MATCHED THEN
+        UPDATE SET 
+            LT1.errormessage = SUBSTR(a.message, 1, 250),
+            LT1.errorcode = CASE
+                                WHEN a.message = 'Successfully Uploaded' THEN 0
+                                ELSE 1
+                            END;
+
+    v_successcount := SQL%ROWCOUNT;
+   
+
+
+    ----- UPDATE SYNC FLAG AS "1" FOR ALL RECORDS IN LT -----
+    UPDATE lea_ex9
+    SET    lea_ex9_195 = 'Y'
+    WHERE  OWNERID=v_ownerid AND lea_ex9_id IN (SELECT leadid
+                          FROM   kmb_ckyc_userimg_lt
+                          WHERE  errorcode = 0
+                                 AND errormessage IN ('Successfully Uploaded')
+                         );
+                         
+                         
+
+    ---- UPDATE RECORD COUNT IN CIS_LOG FOR EASY VISIBILITY ON UI ----
+    UPDATE cis_log
+    SET    successcount = v_successcount
+    WHERE  ownerid =V_OWNERID
+           AND batchnumber = v_batchnumber
+           AND sourceid = v_taskid
+           AND sourcetypeid = 3;
+
+  --  COMMIT;
+
+    ----- PROVIDE SOURCE AND TARGET PATH AS OUTPUT -----
+    OPEN CV_1 FOR
+      ----- PROVIDE SOURCE AND TARGET PATH FOR DOCUMENTS -----
+      SELECT '\\10.240.21.222\uploadroot\Store641\' || attachedid || '_1'  AS SourcePath,
+             'D:\Kotak_CC\CKYC_Image\Attachment\NTB\'|| ARN ||'_EKYC_PHOTO_001'|| v_currentdate ||'.jpeg' AS TargetPath
+            
+      FROM   kmb_ckyc_userimg_lt lt2
+             inner join attachmentmaster A
+                     ON A.ownerid = V_OWNERID
+                        AND lt2.leadid = A.itemid
+             inner join dmsmaster D
+                     ON d.ownerid = A.ownerid
+                        AND A.attachedid = d.itemid
+             inner join dms_ex1 DE1
+                     ON D.ownerid = DE1.ownerid
+                        AND D.itemid = DE1.dms_ex1_id
+             inner join leads L
+                     ON A.ownerid = L.ownerid
+                        AND A.itemid = L.leadid
+                        AND A.itemtype = 6
+             inner join lea_ex6 LE6
+                     ON L.ownerid = LE6.ownerid
+                        AND L.leadid = LE6.lea_ex6_id
+      WHERE  L.ownerid = V_OWNERID
+           AND L.layoutid IN (112277,112428) -- CC ENHANCEMENT AND SF_CC
+             AND lt2.errorcode = 0
+               AND lt2.CUSTOMERTYPE= 'NTB' 
+             AND D.itemname LIKE 'EKYC_PHOTO%'  -- DOCUMENT NAME SHOULD START WITH "EKYC_PHOTO"
+         
+
+  UNION ALL
+  
+                 SELECT '\\10.240.21.222\uploadroot\Store641\' || attachedid || '_1'  AS SourcePath,
+             'D:\Kotak_CC\CKYC_Image\Attachment\ETB\'|| ARN ||'_EKYC_PHOTO_001'|| v_currentdate ||'.jpeg' AS TargetPath
+            
+      FROM   kmb_ckyc_userimg_lt lt2
+             inner join attachmentmaster A
+                     ON A.ownerid = V_OWNERID
+                        AND lt2.leadid = A.itemid
+             inner join dmsmaster D
+                     ON d.ownerid = A.ownerid
+                        AND A.attachedid = d.itemid
+             inner join dms_ex1 DE1
+                     ON D.ownerid = DE1.ownerid
+                        AND D.itemid = DE1.dms_ex1_id
+             inner join leads L
+                     ON A.ownerid = L.ownerid
+                        AND A.itemid = L.leadid
+                        AND A.itemtype = 6
+             inner join lea_ex6 LE6
+                     ON L.ownerid = LE6.ownerid
+                        AND L.leadid = LE6.lea_ex6_id
+      WHERE  L.ownerid = V_OWNERID
+             AND L.layoutid IN (112277,112428) -- CC ENHANCEMENT AND SF_CC
+             AND lt2.errorcode = 0
+             AND   lt2.CUSTOMERTYPE= 'ETB' 
+             AND D.itemname LIKE 'EKYC_PHOTO%'; 
+  
+END;
+
+/

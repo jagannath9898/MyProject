@@ -1,0 +1,32 @@
+SET SCAN OFF ; 
+delete from  CIS_Mapping_Block where  ownerId = 641 and TaskID in ( 3337,3336,3347,3340,3346,3341,3339);
+SET DEFINE OFF;
+INSERT INTO CIS_Mapping_Block (
+OWNERID,TASKID,BLOCKNUMBER,TYPE,EXPRESSION,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,LASTMODIFIEDBYTYPE
+) VALUES(641,3336,1,1,'<parameters><isasynchcall>false</isasynchcall><hasoutputprams>false</hasoutputprams><MaxApiThreads>4</MaxApiThreads><inputParameters></inputParameters><tgtInputParams></tgtInputParams></parameters>',1320,To_Date('2024-08-01 12:23:47', 'YYYY-MM-DD HH24:MI:SS'),1,To_Date('2024-08-11 03:29:26', 'YYYY-MM-DD HH24:MI:SS'),-1) ; 
+
+INSERT INTO CIS_Mapping_Block (
+OWNERID,TASKID,BLOCKNUMBER,TYPE,EXPRESSION,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,LASTMODIFIEDBYTYPE
+) VALUES(641,3337,1,1,'<parameters><inputparameters><parameters><parameter name="USERIMAGE" paramtype="string" value="!!userimage!!" displayvalue="!!userimage!!" valuetype="1" trackchange="0"></parameter><parameter name="LEADID" paramtype="string" value="!!LEADID!!" displayvalue="!!LEADID!!" valuetype="1" trackchange="0"></parameter></parameters></inputparameters><outputparameters><Mappings><mapping sourceval="Message" sourcedisplayvalue="Message" sourcevaluetype="0" sourecekey="269" desfield="LEA_EX9_196" isfixed="0" trgtfieldid="14699" allowempty="0"></mapping><onerrorfield codevalue="" codetext="" msgvalue="" msgtext="" requestnovalue="" requestnotext=""></onerrorfield></Mappings></outputparameters><MaxApiThreads></MaxApiThreads><resumeFlow>false</resumeFlow></parameters>',1320,To_Date('2024-08-01 12:23:48', 'YYYY-MM-DD HH24:MI:SS'),1,To_Date('2024-08-11 03:29:26', 'YYYY-MM-DD HH24:MI:SS'),-1) ; 
+
+INSERT INTO CIS_Mapping_Block (
+OWNERID,TASKID,BLOCKNUMBER,TYPE,EXPRESSION,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,LASTMODIFIEDBYTYPE
+) VALUES(641,3339,1,1,'<parameters><isasynchcall>false</isasynchcall><hasoutputprams>false</hasoutputprams><MaxApiThreads>4</MaxApiThreads><inputParameters></inputParameters><tgtInputParams></tgtInputParams></parameters>',1320,To_Date('2024-08-01 13:40:12', 'YYYY-MM-DD HH24:MI:SS'),1,To_Date('2024-08-11 03:29:28', 'YYYY-MM-DD HH24:MI:SS'),-1) ; 
+
+INSERT INTO CIS_Mapping_Block (
+OWNERID,TASKID,BLOCKNUMBER,TYPE,EXPRESSION,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,LASTMODIFIEDBYTYPE
+) VALUES(641,3340,1,1,'<parameters><sourcePath>!!SourcePath!!</sourcePath><targetPath>!!TargetPath!!</targetPath><isFolder>false</isFolder><deleteSourceFile>true</deleteSourceFile><protocol>none</protocol><serverIP></serverIP><userID></userID><password>L26gIyQ+Sbk20o/blOrjxw==</password><fileName>undefined</fileName><privateKeyFilePath></privateKeyFilePath><passPhrase></passPhrase><isFileNameSpecified>true</isFileNameSpecified><fileFilter></fileFilter><filter></filter><portNumber></portNumber><searchPattern></searchPattern></parameters>',1320,To_Date('2024-08-01 13:40:13', 'YYYY-MM-DD HH24:MI:SS'),1,To_Date('2024-08-11 03:29:28', 'YYYY-MM-DD HH24:MI:SS'),-1) ; 
+
+INSERT INTO CIS_Mapping_Block (
+OWNERID,TASKID,BLOCKNUMBER,TYPE,EXPRESSION,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,LASTMODIFIEDBYTYPE
+) VALUES(641,3341,1,1,'<parameters><isasynchcall>false</isasynchcall><hasoutputprams>false</hasoutputprams><MaxApiThreads>4</MaxApiThreads><inputParameters></inputParameters><tgtInputParams></tgtInputParams></parameters>',1320,To_Date('2024-08-01 13:40:14', 'YYYY-MM-DD HH24:MI:SS'),1,To_Date('2024-08-11 03:29:29', 'YYYY-MM-DD HH24:MI:SS'),-1) ; 
+
+INSERT INTO CIS_Mapping_Block (
+OWNERID,TASKID,BLOCKNUMBER,TYPE,EXPRESSION,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,LASTMODIFIEDBYTYPE
+) VALUES(641,3346,1,1,'<parameters><sourcePath>D:\Kotak_CC\CKYC_Image\Attachment\NTB</sourcePath><targetPath>D:\CRMNEXT_KMB\KMB_LEAD_HANDOFF_LOS\KMB_CC_LEADDOC_HANDOFF\NTB</targetPath><isFolder>true</isFolder><deleteSourceFile>false</deleteSourceFile><protocol>none</protocol><serverIP></serverIP><userID></userID><password>L26gIyQ+Sbk20o/blOrjxw==</password><fileName></fileName><privateKeyFilePath></privateKeyFilePath><passPhrase></passPhrase><isFileNameSpecified>false</isFileNameSpecified><fileFilter></fileFilter><filter></filter><portNumber></portNumber><searchPattern></searchPattern></parameters>',1320,To_Date('2024-08-11 01:53:07', 'YYYY-MM-DD HH24:MI:SS'),1,To_Date('2024-08-11 03:29:29', 'YYYY-MM-DD HH24:MI:SS'),-1) ; 
+
+INSERT INTO CIS_Mapping_Block (
+OWNERID,TASKID,BLOCKNUMBER,TYPE,EXPRESSION,CREATEDBY,CREATEDON,LASTMODIFIEDBY,LASTMODIFIEDON,LASTMODIFIEDBYTYPE
+) VALUES(641,3347,1,1,'<parameters><sourcePath>D:\Kotak_CC\CKYC_Image\Attachment\ETB</sourcePath><targetPath>D:\CRMNEXT_KMB\KMB_LEAD_HANDOFF_LOS\KMB_CC_LEADDOC_HANDOFF\ETB</targetPath><isFolder>true</isFolder><deleteSourceFile>false</deleteSourceFile><protocol>none</protocol><serverIP></serverIP><userID></userID><password>L26gIyQ+Sbk20o/blOrjxw==</password><fileName></fileName><privateKeyFilePath></privateKeyFilePath><passPhrase></passPhrase><isFileNameSpecified>false</isFileNameSpecified><fileFilter></fileFilter><filter></filter><portNumber></portNumber><searchPattern></searchPattern></parameters>',1320,To_Date('2024-08-11 01:53:09', 'YYYY-MM-DD HH24:MI:SS'),1,To_Date('2024-08-11 03:29:29', 'YYYY-MM-DD HH24:MI:SS'),-1) ; 
+
+

@@ -1,0 +1,84 @@
+create or replace 
+PROCEDURE KMB_CKYC_INSERT_LT(V_OWNERID IN NUMBER)
+AS
+  v_jobid        NUMBER(10, 0);
+  v_taskid       NUMBER(10, 0);
+  v_batchnumber  NUMBER(10, 0);
+  v_currentdate  DATE;
+  v_successcount NUMBER(10, 0);
+  v_failurecount NUMBER(10, 0);
+BEGIN
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_SORT=''BINARY_CI''';
+
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_COMP=''LINGUISTIC''';
+
+    EXECUTE IMMEDIATE 'TRUNCATE TABLE  KMB_CKYC_USERIMG_LT';
+
+    ---------------------- Insert Data Into KMB_LITMUS_MEETING_LT--------------------------------------------
+    INSERT INTO kmb_ckyc_userimg_lt
+                (ekycid,
+                 leadid,
+                 userimage,
+                 layoutid,
+                 processid,
+                 arn,
+                 biometric_flag,
+                 customertype)
+    SELECT ek.customobjectid              AS EKYCID,
+           ek.relatedtoid                 AS LEADID,
+           Kmb_blob_to_clob(ek.userimage) AS USERIMAGE,
+           --ek.userimage,
+           l.layoutid,
+           ek.processid,
+           l6.lea_ex6_161                 AS ARN,
+           l6.lea_ex6_87                  AS Biometric_flag,
+           l6.lea_ex6_81                  AS CUSTOMERTYPE
+    FROM   ekyc ek
+    
+           inner join leads l
+                   ON l.ownerid=ek.ownerid
+                   AND l.leadid=ek.relatedtoid
+           inner join lea_ex6 l6
+                   ON ek.ownerid = l6.ownerid
+                      AND ek.relatedtoid = l6.lea_ex6_id
+           inner join lea_ex9 l9
+                   ON l6.ownerid = l9.ownerid
+                      AND l6.lea_ex6_id = l9.lea_ex9_id
+    WHERE  ek.ownerid = v_ownerid
+             AND  l6.LEA_EX6_87=3 --biometric flag for success records
+           AND lea_ex9_195 IS NULL --FLAG to maintain duplicate records
+             AND EKYCSTATUS='00' --- EKYC Status
+             AND L.LAYOUTID IN (112277,112428) --Lead LayoutId
+           AND rownum<=10;
+
+    v_successcount := SQL%rowcount;
+
+    ---------------------------- Fetch Job ID of this job ------------------------
+    SELECT jobid
+    INTO   v_jobid
+    FROM   cis_job
+    WHERE  ownerid = v_ownerid
+           AND jobname = 'CC CKYC Attachment';
+
+    ------------ Fetch Task Id of this Task -----------
+    SELECT taskid
+    INTO   v_taskid
+    FROM   cis_task
+    WHERE  ownerid = v_ownerid
+           AND jobid = v_jobid
+           AND taskname = 'Insert data into LT table';
+
+    ---------------------------- Fetch Current Date Time And Job Execution Batch Number ------------------------
+    v_currentdate := Getutcdate();
+
+    v_batchnumber := Cis_get_batch_number(v_ownerid, v_jobid);
+
+    ---------------------- Update count of User Mapping for deletion for ease of visibility on UI --------------------
+    UPDATE cis_log
+    SET    successcount = v_successcount
+    WHERE  ownerid = v_ownerid
+           AND batchnumber = v_batchnumber
+           AND sourceid = v_taskid;
+END;
+
+/
