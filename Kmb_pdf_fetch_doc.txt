@@ -1,0 +1,31 @@
+create or replace 
+PROCEDURE Kmb_pdf_fetch_doc(v_ownerid NUMBER, 
+                                              cv_1      OUT SYS_REFCURSOR) 
+AS 
+BEGIN 
+    OPEN CV_1 FOR 
+      SELECT '\\10.10.5.138\uploadroot\Store641\' 
+             || Max(a.attachedid) 
+             || '_1'         AS DOCPATH, 
+             '\\10.10.5.138\Uploadroot\SecuredCard_PDF\ExportForm_Data\'
+             ||NVL(L2.lea_ex2_85,'1908555000002')||'.pdf' AS TargetPath 
+      FROM   dmsmaster d 
+             inner join attachmentmaster a 
+                     ON d.ownerid = a.ownerid 
+                        AND d.itemid = a.attachedid 
+                        AND a.itemtype = 6 
+             inner join leads l
+                     ON l.ownerid = a.ownerid 
+                        AND l.leadid = a.itemid 
+             inner join lea_ex3 L3 
+                     ON l.ownerid = L3.ownerid 
+                        AND l.leadid = L3.lea_ex3_id 
+             inner join lea_ex2 L2 
+                     ON l.ownerid = L2.ownerid 
+                        AND l.leadid = L2.lea_ex2_id 
+      WHERE  l.ownerid = 641 
+             AND l.layoutid = 111229 
+             AND l.statuscodeid = 100091 
+             AND Nvl(L3.lea_ex3_189, 'N') <> 'Y' 
+      GROUP  BY L2.LEA_EX2_85; 
+END;

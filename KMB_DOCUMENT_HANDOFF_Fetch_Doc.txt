@@ -1,0 +1,69 @@
+create or replace 
+PROCEDURE KMB_DOCUMENT_HANDOFF_Fetch_Doc
+(
+    v_OwnerID NUMBER,
+    cv_1   OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+
+
+    open CV_1 for
+
+
+
+      select '\\10.10.5.138\\UploadRoot\\Store641\\' || a.ATTACHEDID || '_1' as DocPath,
+             '\\10.240.5.97\\LOS_App6\\UpLoads\\Lead\\' || lex1.Lea_ex1_183 || '\\Borrower_' || TRANSLATE(d.ITEMNAME,'!,@#$%^&*()-:";<>?/|\','______________________') as TargetPath
+      FROM   DMSMASTER d
+             inner join ATTACHMENTMASTER a
+                     ON d.OWNERID = a.OWNERID
+                        AND d.ITEMID = a.Attachedid
+                        AND a.ITEMTYPE = 6
+             inner join LEADS l
+                     ON l.OWNERID = a.OWNERID
+                        AND l.LEADID = a.ITEMID
+             inner join Lea_ex1 lex1
+                    ON l.ownerid=lex1.ownerid
+                      AND l.leadid = lex1.lea_ex1_id
+             inner join DMS_EX1 ex1
+                     ON a.OWNERID = ex1.OWNERID
+                        AND a.ATTACHEDID = ex1.DMS_EX1_ID
+      WHERE l.OWNERID = V_OWNERID
+      AND       l.layoutid in (111207,111206,111198,111196,111195,111193,112260)
+      and       l.STATUSCODEID in(100041,100020,100043,100044,100045,100057,100046,100042,100047,100049,100050)
+             AND NVL(ex1.DMS_EX1_1,'N') = 'N'
+             AND lex1.Lea_ex1_183 is not null
+
+
+      UNION ALL
+
+
+      SELECT '\\10.10.5.138\\UploadRoot\\Store641\\' || a.ATTACHEDID || '_1' as DocPath,
+             '\\10.240.5.97\\LOS_App6\\UpLoads\\Lead\\' || lex1.Lea_ex1_183 || '\\Coborrower_' || TRANSLATE(d.ITEMNAME,'!,@#$%^&*()-:";<>?/|\','______________________') as TargetPath
+      FROM   DMSMASTER d
+             inner join ATTACHMENTMASTER a
+                     ON d.OWNERID = a.OWNERID
+                        AND d.ITEMID = a.Attachedid
+                        AND a.ITEMTYPE = 403
+            inner join Application A1
+                    ON a1.ownerid=A.ownerid
+                    AND a.ITEMID=a1.applicationid
+             inner join APL_EX1 aex
+                    ON A1.ownerid=aex.ownerid
+                    AND A1.Applicationid=aex.apl_ex1_id
+             inner join  Lea_ex1  lex1
+                    ON Aex.ownerid=lex1.ownerid
+                    AND Aex.APL_EX1_20=lex1.lea_ex1_id
+                     Inner join Leads l
+                    on lex1.ownerid=l.ownerid
+                    and lex1.lea_ex1_id=l.leadid
+             inner join DMS_EX1 ex1
+                     ON a.OWNERID = ex1.OWNERID
+                        AND a.ATTACHEDID = ex1.DMS_EX1_ID
+      WHERE  --l.STATUSCODEID in(100041,100020,100043,100044,100045,100057,100046,100042,100047,100049,100050)
+      a.OWNERID = V_OWNERID
+       AND       l.layoutid in (111207,111206,111198,111196,111195,111193,112260)
+       AND             NVL(DMS_EX1_1,'N') = 'N'
+             AND lex1.Lea_ex1_183 is not null
+             ;
+END;
